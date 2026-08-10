@@ -13,67 +13,8 @@ function CreatePost() {
   const [category, setCategory] = useState('General');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [customAlias, setCustomAlias] = useState('');
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageData, setImageData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setMessage('Please select an image file');
-      return;
-    }
-
-    // Validate file size (max 3MB)
-    if (file.size > 3 * 1024 * 1024) {
-      setMessage('Image must be under 3MB');
-      return;
-    }
-
-    // Compress image using canvas
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        // Resize if too large (max 800px on longest side)
-        const maxSize = 800;
-        if (width > maxSize || height > maxSize) {
-          if (width > height) {
-            height = (height / width) * maxSize;
-            width = maxSize;
-          } else {
-            width = (width / height) * maxSize;
-            height = maxSize;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Convert to JPEG at 70% quality for smaller size
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        setImagePreview(compressedDataUrl);
-        setImageData(compressedDataUrl);
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeImage = () => {
-    setImagePreview(null);
-    setImageData(null);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,14 +27,12 @@ function CreatePost() {
         content,
         category,
         isAnonymous,
-        customAlias: customAlias || undefined,
-        imageUrl: imageData || null
+        customAlias: customAlias || undefined
       });
       setMessage('Your post has been submitted for approval! ☕');
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Failed to submit post. Try a smaller image or try again.';
-      setMessage(errorMsg);
+      setMessage('Failed to submit post. Please try again.');
     }
     setSubmitting(false);
   };
@@ -106,7 +45,7 @@ function CreatePost() {
       </div>
 
       {message && (
-        <div className={`message ${message.includes('Failed') || message.includes('must') || message.includes('Please') ? 'message-error' : 'message-success'}`}>
+        <div className={`message ${message.includes('Failed') ? 'message-error' : 'message-success'}`}>
           {message}
         </div>
       )}
@@ -135,54 +74,6 @@ function CreatePost() {
               style={{ minHeight: '180px' }}
               required
             />
-          </div>
-
-          <div className="form-group">
-            <label>Add a Photo (optional)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              style={{
-                padding: '0.5rem',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-sm)',
-                width: '100%'
-              }}
-            />
-            {imagePreview && (
-              <div style={{ marginTop: '0.8rem', position: 'relative' }}>
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '200px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border)'
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  style={{
-                    position: 'absolute',
-                    top: '0.5rem',
-                    right: '0.5rem',
-                    background: 'var(--danger)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="form-group">

@@ -37,7 +37,7 @@ function Admin() {
   const handleAction = async (postId, action) => {
     try {
       if (action === 'delete') {
-        if (!window.confirm('Permanently delete this post?')) return;
+        if (!window.confirm('Permanently delete this post? This cannot be undone.')) return;
         await api.delete(`/admin/posts/${postId}`);
       } else {
         await api.patch(`/admin/posts/${postId}/${action}`);
@@ -74,15 +74,15 @@ function Admin() {
           </div>
           <div className="stat-card">
             <div className="number">{stats.approved}</div>
-            <div className="label">Approved</div>
+            <div className="label">Live</div>
+          </div>
+          <div className="stat-card">
+            <div className="number">{stats.hidden}</div>
+            <div className="label">Archived</div>
           </div>
           <div className="stat-card">
             <div className="number">{stats.rejected}</div>
             <div className="label">Rejected</div>
-          </div>
-          <div className="stat-card">
-            <div className="number">{stats.hidden}</div>
-            <div className="label">Hidden</div>
           </div>
           <div className="stat-card">
             <div className="number">{stats.totalUsers}</div>
@@ -93,13 +93,13 @@ function Admin() {
 
       {/* Filter */}
       <div className="filter-bar">
-        {['pending', 'approved', 'rejected', 'hidden'].map(f => (
+        {['pending', 'approved', 'hidden', 'rejected'].map(f => (
           <button
             key={f}
             className={`filter-btn ${filter === f ? 'active' : ''}`}
             onClick={() => setFilter(f)}
           >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === 'approved' ? 'Live' : f === 'hidden' ? 'Archived' : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
@@ -109,7 +109,7 @@ function Admin() {
         <div className="loading">Loading...</div>
       ) : posts.length === 0 ? (
         <div className="empty-state">
-          <p>No {filter} posts</p>
+          <p>No {filter === 'approved' ? 'live' : filter === 'hidden' ? 'archived' : filter} posts</p>
         </div>
       ) : (
         posts.map(post => (
@@ -118,26 +118,38 @@ function Admin() {
               <div className="post-meta">
                 <span>☕ {post.authorAlias || 'Anonymous'}</span>
                 <span>{timeAgo(post.createdAt)}</span>
-                <span className={`badge badge-${post.status}`}>{post.status}</span>
+                <span className={`badge badge-${post.status}`}>
+                  {post.status === 'approved' ? 'live' : post.status === 'hidden' ? 'archived' : post.status}
+                </span>
               </div>
               <span className="badge">{post.category}</span>
             </div>
             <h3 style={{ marginBottom: '0.5rem' }}>{post.title}</h3>
             <p className="post-content">{post.content}</p>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
-              {post.status !== 'approved' && (
-                <button className="btn btn-success btn-small" onClick={() => handleAction(post._id, 'approve')}>
-                  ✓ Approve
-                </button>
+              {post.status === 'pending' && (
+                <>
+                  <button className="btn btn-success btn-small" onClick={() => handleAction(post._id, 'approve')}>
+                    ✓ Approve (Go Live)
+                  </button>
+                  <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'reject')}>
+                    ✗ Reject
+                  </button>
+                </>
               )}
               {post.status === 'approved' && (
                 <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'hide')}>
-                  🚫 Archive (Hide from Live)
+                  🚫 Archive (Remove from Live)
                 </button>
               )}
-              {post.status !== 'rejected' && post.status !== 'approved' && (
-                <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'reject')}>
-                  ✗ Reject
+              {post.status === 'hidden' && (
+                <button className="btn btn-success btn-small" onClick={() => handleAction(post._id, 'approve')}>
+                  ✓ Restore to Live
+                </button>
+              )}
+              {post.status === 'rejected' && (
+                <button className="btn btn-success btn-small" onClick={() => handleAction(post._id, 'approve')}>
+                  ✓ Approve (Go Live)
                 </button>
               )}
               <button className="btn btn-danger btn-small" onClick={() => handleAction(post._id, 'delete')}>

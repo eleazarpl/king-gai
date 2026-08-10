@@ -5,10 +5,10 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
+import Announcements from './pages/Announcements';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
-import Announcements from './pages/Announcements';
 
 function App() {
   return (

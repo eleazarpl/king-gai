@@ -83,19 +83,6 @@ function PostDetail() {
         </div>
         <h2 style={{ marginBottom: '1rem' }}>{post.title}</h2>
         <p className="post-content" style={{ whiteSpace: 'pre-wrap' }}>{post.content}</p>
-        {post.imageUrl && (
-          <img
-            src={post.imageUrl}
-            alt="Post attachment"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '400px',
-              borderRadius: 'var(--radius-sm)',
-              marginBottom: '1rem',
-              border: '1px solid var(--border)'
-            }}
-          />
-        )}
         <div className="post-footer">
           <div className="vote-section">
             <button className="vote-btn" onClick={() => handleVote('upvote')} aria-label="Upvote">▲</button>
