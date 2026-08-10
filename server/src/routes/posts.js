@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
     let sortOption = { createdAt: -1 };
     if (sort === 'popular') {
-      sortOption = { createdAt: -1 }; // Will sort by vote count in memory
+      sortOption = { createdAt: -1 };
     }
 
     const posts = await Post.find(query)
@@ -25,7 +25,6 @@ router.get('/', async (req, res) => {
       .limit(parseInt(limit))
       .lean();
 
-    // Add vote counts
     const postsWithVotes = posts.map(post => ({
       ...post,
       voteCount: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
@@ -76,7 +75,7 @@ router.post('/', optionalAuth, async (req, res) => {
       title,
       content,
       category: category || 'General',
-      status: 'pending' // All posts need admin approval
+      status: 'pending'
     };
 
     if (req.user && !isAnonymous) {
@@ -104,11 +103,8 @@ router.post('/:id/upvote', authenticate, async (req, res) => {
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
     const userId = req.user._id;
-
-    // Remove from downvotes if present
     post.downvotes = post.downvotes.filter(id => !id.equals(userId));
 
-    // Toggle upvote
     const alreadyUpvoted = post.upvotes.some(id => id.equals(userId));
     if (alreadyUpvoted) {
       post.upvotes = post.upvotes.filter(id => !id.equals(userId));
@@ -130,11 +126,8 @@ router.post('/:id/downvote', authenticate, async (req, res) => {
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
     const userId = req.user._id;
-
-    // Remove from upvotes if present
     post.upvotes = post.upvotes.filter(id => !id.equals(userId));
 
-    // Toggle downvote
     const alreadyDownvoted = post.downvotes.some(id => id.equals(userId));
     if (alreadyDownvoted) {
       post.downvotes = post.downvotes.filter(id => !id.equals(userId));
@@ -152,7 +145,7 @@ router.post('/:id/downvote', authenticate, async (req, res) => {
 // Add reply to a post
 router.post('/:id/reply', optionalAuth, async (req, res) => {
   try {
-    const { content, isAnonymous, customAlias } = req.body;
+    const { content, isAnonymous, customAlias, parentReplyId } = req.body;
     if (!content) {
       return res.status(400).json({ error: 'Reply content is required' });
     }
@@ -162,7 +155,8 @@ router.post('/:id/reply', optionalAuth, async (req, res) => {
 
     const reply = {
       content,
-      isAnonymous: !req.user || isAnonymous
+      isAnonymous: !req.user || isAnonymous,
+      parentReplyId: parentReplyId || null
     };
 
     if (req.user && !isAnonymous) {

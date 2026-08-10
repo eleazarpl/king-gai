@@ -3,6 +3,139 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
+function ReplyItem({ reply, allReplies, postId, onReplyAdded, depth = 0 }) {
+  const { user } = useAuth();
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyContent, setReplyContent] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [customAlias, setCustomAlias] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const childReplies = allReplies.filter(r =>
+    r.parentReplyId && r.parentReplyId.toString() === reply._id.toString()
+  );
+
+  const timeAgo = (date) => {
+    const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!replyContent.trim()) return;
+    setSubmitting(true);
+    try {
+      await api.post(`/posts/${postId}/reply`, {
+        content: replyContent,
+        isAnonymous,
+        customAlias: customAlias || undefined,
+        parentReplyId: reply._id
+      });
+      setReplyContent('');
+      setCustomAlias('');
+      setShowReplyForm(false);
+      onReplyAdded();
+    } catch (err) {
+      console.error('Failed to reply');
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div style={{ marginLeft: depth > 0 ? '1.5rem' : 0 }}>
+      <div className="reply" style={{ borderLeftColor: depth > 0 ? 'var(--border)' : 'var(--accent)' }}>
+        <div className="reply-meta">
+          <strong>☕ {reply.authorAlias || 'Anonymous'}</strong> · {timeAgo(reply.createdAt)}
+        </div>
+        <p>{reply.content}</p>
+        {depth < 3 && (
+          <button
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--coffee-light)',
+              fontSize: '0.8rem',
+              marginTop: '0.5rem',
+              cursor: 'pointer',
+              padding: 0
+            }}
+          >
+            {showReplyForm ? 'Cancel' : '↩ Reply'}
+          </button>
+        )}
+
+        {showReplyForm && (
+          <form onSubmit={handleSubmit} style={{ marginTop: '0.8rem' }}>
+            <textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder={`Reply to ${reply.authorAlias || 'Anonymous'}...`}
+              maxLength={2000}
+              required
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                minHeight: '60px',
+                resize: 'vertical',
+                fontSize: '0.9rem',
+                fontFamily: 'Inter, sans-serif'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.5rem' }}>
+              <label style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-muted)' }}>
+                <input
+                  type="checkbox"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  style={{ width: '14px', height: '14px' }}
+                />
+                Anonymous
+              </label>
+              {(isAnonymous || !user) && (
+                <input
+                  type="text"
+                  value={customAlias}
+                  onChange={(e) => setCustomAlias(e.target.value)}
+                  placeholder="Alias"
+                  maxLength={30}
+                  style={{
+                    padding: '0.3rem 0.5rem',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.8rem',
+                    width: '120px'
+                  }}
+                />
+              )}
+              <button type="submit" className="btn btn-primary btn-small" disabled={submitting}>
+                {submitting ? '...' : 'Reply'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Child replies */}
+      {childReplies.map(child => (
+        <ReplyItem
+          key={child._id}
+          reply={child}
+          allReplies={allReplies}
+          postId={postId}
+          onReplyAdded={onReplyAdded}
+          depth={depth + 1}
+        />
+      ))}
+    </div>
+  );
+}
+
 function PostDetail() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -71,6 +204,9 @@ function PostDetail() {
   if (loading) return <div className="loading">Loading... ☕</div>;
   if (!post) return <div className="empty-state"><p>Post not found</p></div>;
 
+  // Get top-level replies (no parentReplyId)
+  const topLevelReplies = (post.replies || []).filter(r => !r.parentReplyId);
+
   return (
     <div style={{ paddingTop: '2rem' }}>
       <div className="card">
@@ -98,16 +234,18 @@ function PostDetail() {
       {post.replies?.length === 0 && (
         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>No replies yet. Start the conversation!</p>
       )}
-      {post.replies?.map((reply, i) => (
-        <div key={reply._id || i} className="reply">
-          <div className="reply-meta">
-            <strong>☕ {reply.authorAlias || 'Anonymous'}</strong> · {timeAgo(reply.createdAt)}
-          </div>
-          <p>{reply.content}</p>
-        </div>
+
+      {topLevelReplies.map(reply => (
+        <ReplyItem
+          key={reply._id}
+          reply={reply}
+          allReplies={post.replies}
+          postId={id}
+          onReplyAdded={fetchPost}
+        />
       ))}
 
-      {/* Reply form */}
+      {/* Top-level reply form */}
       <div className="card" style={{ marginTop: '1.5rem' }}>
         <h4 style={{ marginBottom: '1rem' }}>Add a Reply</h4>
         {message && (

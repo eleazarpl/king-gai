@@ -18,7 +18,7 @@ function Header() {
           King Gai <span>傾偈</span>
         </Link>
         <nav className="header-nav">
-          <Link to="/announcements">Updates</Link>
+          <Link to="/announcements">Highlights</Link>
           <Link to="/create">Share</Link>
           {user ? (
             <>

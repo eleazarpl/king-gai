@@ -19,6 +19,10 @@ const replySchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  parentReplyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

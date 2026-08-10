@@ -78,7 +78,7 @@ function Announcements() {
   return (
     <div>
       <div className="page-header">
-        <h1>📢 Announcements</h1>
+        <h1>📢 Highlights</h1>
         <p>Updates and news from King Gai</p>
       </div>
 
