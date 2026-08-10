@@ -28,16 +28,44 @@ function CreatePost() {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage('Image must be under 5MB');
+    // Validate file size (max 3MB)
+    if (file.size > 3 * 1024 * 1024) {
+      setMessage('Image must be under 3MB');
       return;
     }
 
+    // Compress image using canvas
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreview(reader.result);
-      setImageData(reader.result);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Resize if too large (max 800px on longest side)
+        const maxSize = 800;
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = (height / width) * maxSize;
+            width = maxSize;
+          } else {
+            width = (width / height) * maxSize;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to JPEG at 70% quality for smaller size
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        setImagePreview(compressedDataUrl);
+        setImageData(compressedDataUrl);
+      };
+      img.src = reader.result;
     };
     reader.readAsDataURL(file);
   };
@@ -53,26 +81,19 @@ function CreatePost() {
 
     setSubmitting(true);
     try {
-      let imageUrl = null;
-
-      // Upload image if present
-      if (imageData) {
-        const uploadRes = await api.post('/upload/base64', { imageData });
-        imageUrl = uploadRes.data.imageUrl;
-      }
-
       await api.post('/posts', {
         title,
         content,
         category,
         isAnonymous,
         customAlias: customAlias || undefined,
-        imageUrl
+        imageUrl: imageData || null
       });
       setMessage('Your post has been submitted for approval! ☕');
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      setMessage('Failed to submit post. Please try again.');
+      const errorMsg = err.response?.data?.error || 'Failed to submit post. Try a smaller image or try again.';
+      setMessage(errorMsg);
     }
     setSubmitting(false);
   };
