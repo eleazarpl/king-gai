@@ -42,6 +42,19 @@ function PostCard({ post, onVote }) {
       <p className="post-content">
         {post.content.length > 200 ? post.content.slice(0, 200) + '...' : post.content}
       </p>
+      {post.imageUrl && (
+        <img
+          src={post.imageUrl}
+          alt="Post attachment"
+          style={{
+            maxWidth: '100%',
+            maxHeight: '250px',
+            borderRadius: 'var(--radius-sm)',
+            marginBottom: '1rem',
+            border: '1px solid var(--border)'
+          }}
+        />
+      )}
       <div className="post-footer">
         <div className="vote-section">
           <button

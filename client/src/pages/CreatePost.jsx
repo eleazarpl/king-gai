@@ -13,8 +13,39 @@ function CreatePost() {
   const [category, setCategory] = useState('General');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [customAlias, setCustomAlias] = useState('');
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageData, setImageData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setMessage('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage('Image must be under 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setImageData(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setImageData(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,12 +53,21 @@ function CreatePost() {
 
     setSubmitting(true);
     try {
+      let imageUrl = null;
+
+      // Upload image if present
+      if (imageData) {
+        const uploadRes = await api.post('/upload/base64', { imageData });
+        imageUrl = uploadRes.data.imageUrl;
+      }
+
       await api.post('/posts', {
         title,
         content,
         category,
         isAnonymous,
-        customAlias: customAlias || undefined
+        customAlias: customAlias || undefined,
+        imageUrl
       });
       setMessage('Your post has been submitted for approval! ☕');
       setTimeout(() => navigate('/'), 2000);
@@ -45,7 +85,7 @@ function CreatePost() {
       </div>
 
       {message && (
-        <div className={`message ${message.includes('Failed') ? 'message-error' : 'message-success'}`}>
+        <div className={`message ${message.includes('Failed') || message.includes('must') || message.includes('Please') ? 'message-error' : 'message-success'}`}>
           {message}
         </div>
       )}
@@ -74,6 +114,54 @@ function CreatePost() {
               style={{ minHeight: '180px' }}
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label>Add a Photo (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{
+                padding: '0.5rem',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                width: '100%'
+              }}
+            />
+            {imagePreview && (
+              <div style={{ marginTop: '0.8rem', position: 'relative' }}>
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '200px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border)'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  style={{
+                    position: 'absolute',
+                    top: '0.5rem',
+                    right: '0.5rem',
+                    background: 'var(--danger)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="form-group">

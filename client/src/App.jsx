@@ -8,6 +8,7 @@ import CreatePost from './pages/CreatePost';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
+import Announcements from './pages/Announcements';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/create" element={<CreatePost />} />
+            <Route path="/announcements" element={<Announcements />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<Admin />} />

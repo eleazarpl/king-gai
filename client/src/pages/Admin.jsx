@@ -130,18 +130,18 @@ function Admin() {
                   ✓ Approve
                 </button>
               )}
-              {post.status !== 'rejected' && (
+              {post.status === 'approved' && (
+                <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'hide')}>
+                  🚫 Archive (Hide from Live)
+                </button>
+              )}
+              {post.status !== 'rejected' && post.status !== 'approved' && (
                 <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'reject')}>
                   ✗ Reject
                 </button>
               )}
-              {post.status === 'approved' && (
-                <button className="btn btn-secondary btn-small" onClick={() => handleAction(post._id, 'hide')}>
-                  👁 Hide
-                </button>
-              )}
               <button className="btn btn-danger btn-small" onClick={() => handleAction(post._id, 'delete')}>
-                🗑 Delete
+                🗑 Delete Permanently
               </button>
             </div>
           </div>
