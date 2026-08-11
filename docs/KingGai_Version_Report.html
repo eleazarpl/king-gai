@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>King Gai 傾偈 — Version & Scaling Report</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; color: #2d1810; line-height: 1.7; background: #fffcf8; }
+  h1 { font-size: 2rem; color: #3b2016; border-bottom: 3px solid #d4a574; padding-bottom: 0.5rem; }
+  h2 { font-size: 1.4rem; color: #6b4226; margin-top: 2.5rem; border-bottom: 1px solid #e8d5c4; padding-bottom: 0.3rem; }
+  h3 { font-size: 1.1rem; color: #3b2016; margin-top: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid #e8d5c4; padding: 0.6rem 0.8rem; text-align: left; }
+  th { background: #f5ebe0; color: #3b2016; font-weight: 600; }
+  tr:nth-child(even) { background: #faf6f1; }
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: #d4edda; color: #155724; }
+  .badge-yellow { background: #fff3cd; color: #856404; }
+  .badge-red { background: #f8d7da; color: #721c24; }
+  .badge-blue { background: #d1ecf1; color: #0c5460; }
+  .section-box { background: #f5ebe0; border-radius: 8px; padding: 1.2rem; margin: 1rem 0; border-left: 4px solid #d4a574; }
+  .warning-box { background: #fff3cd; border-radius: 8px; padding: 1.2rem; margin: 1rem 0; border-left: 4px solid #ffc107; }
+  .info-box { background: #d1ecf1; border-radius: 8px; padding: 1.2rem; margin: 1rem 0; border-left: 4px solid #17a2b8; }
+  ul { padding-left: 1.5rem; }
+  li { margin-bottom: 0.4rem; }
+  .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e8d5c4; font-size: 0.85rem; color: #9b7b6b; text-align: center; }
+  @media print { body { background: white; } .section-box, .warning-box, .info-box { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>☕ King Gai 傾偈 — Version & Scaling Report</h1>
+<p><strong>Project:</strong> King Gai Community Confession Forum<br>
+<strong>Purpose:</strong> Passion project companion to the Keng Gai coffee shop<br>
+<strong>Date:</strong> August 2026</p>
+
+<h2>1. Version History</h2>
+
+<h3>Version 1.0 — Foundation <span class="badge badge-green">Stable</span></h3>
+<p><strong>Git Tag:</strong> v1.0 &nbsp;|&nbsp; <strong>Status:</strong> Deployed & Tagged</p>
+<p>The first stable release with all core forum functionality.</p>
+<table>
+<tr><th>Feature</th><th>Description</th></tr>
+<tr><td>User Registration & Login</td><td>Email + password signup, JWT-based sessions, 7-day token expiry</td></tr>
+<tr><td>Post Confessions</td><td>Title + content, categorized posts, max 5000 characters</td></tr>
+<tr><td>Anonymous Posting</td><td>Post as yourself, anonymously, or with a custom alias</td></tr>
+<tr><td>Upvote / Downvote</td><td>Logged-in users can vote, toggle votes, prevents double-voting</td></tr>
+<tr><td>Replies</td><td>Anyone can reply to posts (flat, single-level replies)</td></tr>
+<tr><td>Categories</td><td>General, Confessions, Happiness, Struggles, Solutions, Random</td></tr>
+<tr><td>Admin Approval Queue</td><td>All posts require admin approval before going live</td></tr>
+<tr><td>Admin Panel</td><td>Dashboard with stats, approve/reject/archive/delete posts</td></tr>
+<tr><td>Announcements Page</td><td>Separate page for admin updates, with pin functionality</td></tr>
+<tr><td>Rate Limiting</td><td>100 requests per 15 minutes per IP</td></tr>
+<tr><td>Responsive Design</td><td>Works on mobile and desktop, cozy coffee-shop theme</td></tr>
+</table>
+
+<h3>Version 2.0 — Current <span class="badge badge-blue">Live</span></h3>
+<p><strong>Built on:</strong> v1.0 &nbsp;|&nbsp; <strong>Status:</strong> Deployed</p>
+<table>
+<tr><th>Feature</th><th>Description</th></tr>
+<tr><td>Threaded Replies</td><td>Users can reply to replies, creating conversation threads up to 3 levels deep</td></tr>
+<tr><td>Logo Update</td><td>Cantonese text 傾偈 enlarged to match "King Gai" sizing</td></tr>
+<tr><td>Highlights Page</td><td>Announcements renamed to "Highlights" for better branding</td></tr>
+</table>
+
+<h2>2. Current Limitations</h2>
+
+<h3>Feature Gaps (vs Reddit, X, Whisper)</h3>
+<table>
+<tr><th>Feature</th><th>Status</th><th>Impact</th></tr>
+<tr><td>Search</td><td><span class="badge badge-red">Missing</span></td><td>Users cannot find old posts</td></tr>
+<tr><td>User Profiles</td><td><span class="badge badge-red">Missing</span></td><td>No post history or identity persistence</td></tr>
+<tr><td>Notifications</td><td><span class="badge badge-red">Missing</span></td><td>Users don't know when they get replies</td></tr>
+<tr><td>Image Uploads</td><td><span class="badge badge-red">Missing</span></td><td>Text-only posts</td></tr>
+<tr><td>Edit/Delete Own Posts</td><td><span class="badge badge-red">Missing</span></td><td>Users can't manage their content</td></tr>
+<tr><td>Password Reset</td><td><span class="badge badge-red">Missing</span></td><td>Locked out users must create new accounts</td></tr>
+<tr><td>Social Login (Google)</td><td><span class="badge badge-red">Missing</span></td><td>Higher friction to sign up</td></tr>
+<tr><td>Report Post</td><td><span class="badge badge-red">Missing</span></td><td>Community can't flag bad content</td></tr>
+<tr><td>Dark Mode</td><td><span class="badge badge-red">Missing</span></td><td>No theme preference</td></tr>
+<tr><td>Infinite Scroll / Load More</td><td><span class="badge badge-yellow">Basic</span></td><td>Only shows 20 posts per load</td></tr>
+<tr><td>Share Link Previews</td><td><span class="badge badge-yellow">Partial</span></td><td>No Open Graph tags for social sharing</td></tr>
+<tr><td>Email Verification</td><td><span class="badge badge-red">Missing</span></td><td>Fake emails accepted</td></tr>
+<tr><td>CAPTCHA</td><td><span class="badge badge-red">Missing</span></td><td>Vulnerable to bot spam</td></tr>
+</table>
+
+<h3>Security Considerations</h3>
+<table>
+<tr><th>Area</th><th>Current State</th><th>Risk Level</th></tr>
+<tr><td>Authentication</td><td>JWT stored in localStorage</td><td><span class="badge badge-yellow">Medium</span> — XSS vulnerable</td></tr>
+<tr><td>Admin Access</td><td>Single password, no 2FA</td><td><span class="badge badge-yellow">Medium</span></td></tr>
+<tr><td>Input Validation</td><td>Length limits enforced</td><td><span class="badge badge-green">Good</span></td></tr>
+<tr><td>Rate Limiting</td><td>100 req/15min per IP</td><td><span class="badge badge-green">Good</span></td></tr>
+<tr><td>Password Storage</td><td>bcrypt with 12 rounds</td><td><span class="badge badge-green">Good</span></td></tr>
+<tr><td>Content Moderation</td><td>Manual admin approval</td><td><span class="badge badge-green">Good</span> — but doesn't scale</td></tr>
+</table>
+
+<h2>3. Free Tier Limitations</h2>
+
+<div class="warning-box">
+<strong>⚠️ Important:</strong> The current setup costs $0/month but has real constraints that will become problems as traffic grows.
+</div>
+
+<h3>Current Free Tier Constraints</h3>
+<table>
+<tr><th>Service</th><th>Free Tier Limit</th><th>What Happens When Exceeded</th></tr>
+<tr><td>Render (Backend)</td><td>750 hours/month, sleeps after 15 min idle</td><td>First request after sleep takes 30-50 seconds to respond. Users think the site is broken.</td></tr>
+<tr><td>MongoDB Atlas</td><td>512 MB storage, shared CPU</td><td>Database becomes full. New posts can't be saved. Queries slow down.</td></tr>
+<tr><td>Vercel (Frontend)</td><td>100 GB bandwidth/month</td><td>Site goes offline until next billing cycle.</td></tr>
+<tr><td>Render (Backend)</td><td>512 MB RAM</td><td>Server crashes under heavy concurrent load.</td></tr>
+</table>
+
+<h3>When Will You Hit These Limits?</h3>
+<div class="section-box">
+<strong>Rough estimates:</strong>
+<ul>
+<li><strong>~1,000 posts</strong> → MongoDB starts getting sluggish without indexes</li>
+<li><strong>~50 concurrent users</strong> → Render free tier may struggle with response times</li>
+<li><strong>~10,000 monthly visitors</strong> → You're fine on bandwidth but cold starts become annoying</li>
+<li><strong>~5,000 posts with replies</strong> → Approaching 512 MB storage limit</li>
+</ul>
+</div>
+
+<h2>4. Scaling Roadmap — When Traffic Grows</h2>
+
+<h3>Phase 1: Low Traffic (0–500 monthly users) — FREE</h3>
+<p><em>Where you are now. No changes needed.</em></p>
+<ul>
+<li>Current free stack handles this comfortably</li>
+<li>Cold starts are tolerable with small user base</li>
+<li>Manual admin approval is manageable</li>
+</ul>
+
+<h3>Phase 2: Growing (500–5,000 monthly users) — ~$7–14/month</h3>
+<table>
+<tr><th>Action</th><th>Cost</th><th>What It Fixes</th></tr>
+<tr><td>Upgrade Render to Starter ($7/mo)</td><td>$7</td><td>No more cold starts, always-on server</td></tr>
+<tr><td>Add database indexes</td><td>Free</td><td>Faster queries as posts grow</td></tr>
+<tr><td>Add Redis caching</td><td>Free (Upstash)</td><td>Reduces database load</td></tr>
+<tr><td>Upgrade MongoDB to M2 ($9/mo)</td><td>$9</td><td>2 GB storage, dedicated resources</td></tr>
+<tr><td>Add Cloudinary for images</td><td>Free (25 GB)</td><td>Enables image uploads without bloating DB</td></tr>
+</table>
+
+<h3>Phase 3: Active Community (5,000–50,000 monthly users) — ~$25–50/month</h3>
+<table>
+<tr><th>Action</th><th>Cost</th><th>What It Fixes</th></tr>
+<tr><td>Render Standard plan ($25/mo)</td><td>$25</td><td>More CPU/RAM, auto-scaling</td></tr>
+<tr><td>MongoDB M5+ ($25/mo)</td><td>$25</td><td>5 GB+, better performance</td></tr>
+<tr><td>Add CDN (Cloudflare, free)</td><td>Free</td><td>Faster global load times</td></tr>
+<tr><td>Custom domain + SSL</td><td>~$12/year</td><td>Professional URL (kinggai.com)</td></tr>
+<tr><td>Add automated content moderation</td><td>Varies</td><td>AI-assisted filtering to reduce admin workload</td></tr>
+<tr><td>Email service (Resend free tier)</td><td>Free</td><td>Password resets, notifications</td></tr>
+</table>
+
+<h3>Phase 4: Mainstream (50,000+ monthly users) — $100+/month</h3>
+<table>
+<tr><th>Action</th><th>Cost</th><th>What It Fixes</th></tr>
+<tr><td>Move to AWS/GCP with load balancer</td><td>$50+</td><td>Horizontal scaling, high availability</td></tr>
+<tr><td>MongoDB Atlas M10+ dedicated</td><td>$50+</td><td>Production-grade database</td></tr>
+<tr><td>Add WebSocket for real-time</td><td>Included</td><td>Live updates without refresh</td></tr>
+<tr><td>Hire moderators or add AI moderation</td><td>Varies</td><td>Manual approval doesn't scale beyond thousands of posts/day</td></tr>
+<tr><td>Implement full analytics</td><td>Free (Plausible/Umami)</td><td>Understand user behavior</td></tr>
+<tr><td>Add mobile app (React Native)</td><td>Dev time</td><td>Better mobile experience, push notifications</td></tr>
+</table>
+
+<h2>5. Recommended Next Steps (Priority Order)</h2>
+
+<div class="info-box">
+<strong>If you do nothing else, do these 5 things when you're ready to grow:</strong>
+<ol>
+<li><strong>Buy a custom domain</strong> (~$12/year) — looks professional, builds brand trust</li>
+<li><strong>Upgrade Render to paid</strong> ($7/mo) — eliminates cold start delays</li>
+<li><strong>Add search functionality</strong> — users need to find content</li>
+<li><strong>Add image uploads via Cloudinary</strong> — visual content drives engagement</li>
+<li><strong>Add Google login</strong> — lowers signup friction dramatically</li>
+</ol>
+</div>
+
+<h2>6. How to Revert to Version 1</h2>
+
+<div class="section-box">
+If anything breaks, run this in Command Prompt:
+<br><br>
+<code style="background: #3b2016; color: #f5ebe0; padding: 0.5rem 1rem; border-radius: 4px; display: block; margin-top: 0.5rem;">
+cd C:\Users\User\Documents\El-Kiro-Verdant\king-gai<br>
+git checkout v1.0<br>
+git push -f origin main
+</code>
+<br>
+This force-pushes Version 1 back to GitHub, and Vercel + Render will auto-deploy the old version.
+<br><br>
+<strong>To go back to latest:</strong><br>
+<code style="background: #3b2016; color: #f5ebe0; padding: 0.5rem 1rem; border-radius: 4px; display: block; margin-top: 0.5rem;">
+git checkout main<br>
+git push -f origin main
+</code>
+</div>
+
+<div class="footer">
+<p>King Gai 傾偈 — Community Confession Forum<br>
+Generated August 2026 | Built with React + Node.js + MongoDB</p>
+</div>
+
+</body>
+</html>

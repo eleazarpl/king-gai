@@ -72,6 +72,11 @@ const postSchema = new mongoose.Schema({
     ref: 'User'
   }],
   replies: [replySchema],
+  reports: [{
+    reason: { type: String },
+    reportedAt: { type: Date, default: Date.now },
+    reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
+  }],
   createdAt: {
     type: Date,
     default: Date.now

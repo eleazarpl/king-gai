@@ -8,6 +8,18 @@ const router = express.Router();
 // All admin routes require authentication + admin role
 router.use(authenticate, adminOnly);
 
+// Get reported posts
+router.get('/posts/reported', async (req, res) => {
+  try {
+    const posts = await Post.find({ 'reports.0': { $exists: true }, status: 'approved' })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch reported posts' });
+  }
+});
+
 // Get pending posts (approval queue)
 router.get('/posts/pending', async (req, res) => {
   try {

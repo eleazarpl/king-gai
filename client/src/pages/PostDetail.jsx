@@ -146,6 +146,7 @@ function PostDetail() {
   const [customAlias, setCustomAlias] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [reportMessage, setReportMessage] = useState('');
 
   useEffect(() => {
     fetchPost();
@@ -193,6 +194,18 @@ function PostDetail() {
     }
   };
 
+  const handleReport = async () => {
+    const reason = window.prompt('Why are you reporting this post? (optional)');
+    if (reason === null) return; // cancelled
+    try {
+      await api.post(`/posts/${id}/report`, { reason: reason || 'Inappropriate content' });
+      setReportMessage('Post reported. Admin will review it.');
+    } catch (err) {
+      setReportMessage('Failed to report post.');
+    }
+    setTimeout(() => setReportMessage(''), 4000);
+  };
+
   const timeAgo = (date) => {
     const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
     if (seconds < 60) return 'just now';
@@ -225,8 +238,21 @@ function PostDetail() {
             <span className="vote-count">{post.voteCount || 0}</span>
             <button className="vote-btn" onClick={() => handleVote('downvote')} aria-label="Downvote">▼</button>
           </div>
-          <span className="post-meta">💬 {post.replies?.length || 0} replies</span>
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+            <span className="post-meta">💬 {post.replies?.length || 0} replies</span>
+            <button
+              onClick={handleReport}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer' }}
+            >
+              🚩 Report
+            </button>
+          </div>
         </div>
+        {reportMessage && (
+          <div className={`message ${reportMessage.includes('Failed') ? 'message-error' : 'message-success'}`} style={{ marginTop: '0.8rem' }}>
+            {reportMessage}
+          </div>
+        )}
       </div>
 
       {/* Replies */}
@@ -262,6 +288,9 @@ function PostDetail() {
               maxLength={2000}
               required
             />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', float: 'right' }}>
+              {replyContent.length}/2000
+            </span>
           </div>
           <div className="form-group">
             <div className="checkbox-group">

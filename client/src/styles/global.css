@@ -508,3 +508,43 @@ input, textarea, select {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Dark mode */
+[data-theme="dark"] {
+  --coffee-dark: #f5ebe0;
+  --coffee-medium: #d4a574;
+  --coffee-light: #c4945e;
+  --cream: #2a2118;
+  --cream-light: #1e1712;
+  --warm-white: #261e17;
+  --accent: #d4a574;
+  --accent-hover: #e0b88a;
+  --text-primary: #f5ebe0;
+  --text-secondary: #d4a574;
+  --text-muted: #9b7b6b;
+  --border: #3d2e22;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-hover: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] body {
+  background-color: var(--cream-light);
+}
+
+[data-theme="dark"] .header {
+  background: #1a120d;
+}
+
+[data-theme="dark"] .badge {
+  background: #3d2e22;
+  color: var(--text-secondary);
+  border-color: #4d3e32;
+}
+
+[data-theme="dark"] .badge-pending { background: #3d3520; color: #ffc107; border-color: #5d4520; }
+[data-theme="dark"] .badge-approved { background: #1d3d1d; color: #6ddb6d; border-color: #2d5d2d; }
+[data-theme="dark"] .badge-rejected { background: #3d1d1d; color: #ff7b7b; border-color: #5d2d2d; }
+[data-theme="dark"] .badge-hidden { background: #2d2d2d; color: #aaa; border-color: #4d4d4d; }
+
+[data-theme="dark"] .message-success { background: #1d3d1d; color: #6ddb6d; border-color: #2d5d2d; }
+[data-theme="dark"] .message-error { background: #3d1d1d; color: #ff7b7b; border-color: #5d2d2d; }

@@ -62,6 +62,9 @@ function CreatePost() {
               maxLength={200}
               required
             />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', float: 'right' }}>
+              {title.length}/200
+            </span>
           </div>
 
           <div className="form-group">
@@ -74,6 +77,9 @@ function CreatePost() {
               style={{ minHeight: '180px' }}
               required
             />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', float: 'right' }}>
+              {content.length}/5000
+            </span>
           </div>
 
           <div className="form-group">
@@ -128,7 +134,7 @@ function CreatePost() {
       </div>
 
       <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '1rem' }}>
-        All posts are reviewed by admin before going live.
+        All posts are reviewed by admin before going live. Read our <a href="/guidelines">community guidelines</a>.
       </p>
     </div>
   );

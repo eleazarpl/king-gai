@@ -4,6 +4,46 @@ const { authenticate, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Search posts
+router.get('/search', async (req, res) => {
+  try {
+    const { q, page = 1, limit = 20 } = req.query;
+    if (!q || q.trim().length === 0) {
+      return res.json({ posts: [], totalPages: 0, currentPage: 1 });
+    }
+
+    const query = {
+      status: 'approved',
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { content: { $regex: q, $options: 'i' } }
+      ]
+    };
+
+    const posts = await Post.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const postsWithVotes = posts.map(post => ({
+      ...post,
+      voteCount: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
+      replyCount: post.replies?.length || 0
+    }));
+
+    const total = await Post.countDocuments(query);
+
+    res.json({
+      posts: postsWithVotes,
+      totalPages: Math.ceil(total / limit),
+      currentPage: parseInt(page)
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Search failed' });
+  }
+});
+
 // Get all approved posts (public)
 router.get('/', async (req, res) => {
   try {
@@ -172,6 +212,59 @@ router.post('/:id/reply', optionalAuth, async (req, res) => {
     res.status(201).json({ message: 'Reply added', reply: post.replies[post.replies.length - 1] });
   } catch (error) {
     res.status(500).json({ error: 'Failed to add reply' });
+  }
+});
+
+// Get my posts (authenticated)
+router.get('/me/posts', authenticate, async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const postsWithVotes = posts.map(post => ({
+      ...post,
+      voteCount: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
+      replyCount: post.replies?.length || 0
+    }));
+
+    res.json(postsWithVotes);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch your posts' });
+  }
+});
+
+// Delete own post
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id, author: req.user._id });
+    if (!post) return res.status(404).json({ error: 'Post not found or not yours' });
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Post deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete post' });
+  }
+});
+
+// Report a post
+router.post('/:id/report', optionalAuth, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    // Add to reported list if not already reported
+    if (!post.reports) post.reports = [];
+    post.reports.push({
+      reason: reason || 'Inappropriate content',
+      reportedAt: new Date(),
+      reportedBy: req.user?._id || null
+    });
+    await post.save();
+
+    res.json({ message: 'Post reported. Admin will review it.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to report post' });
   }
 });
 

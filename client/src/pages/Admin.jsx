@@ -24,10 +24,12 @@ function Admin() {
     try {
       const [statsRes, postsRes] = await Promise.all([
         api.get('/admin/stats'),
-        api.get(`/admin/posts?status=${filter}`)
+        filter === 'reported'
+          ? api.get('/admin/posts/reported')
+          : api.get(`/admin/posts?status=${filter}`)
       ]);
       setStats(statsRes.data);
-      setPosts(postsRes.data);
+      setPosts(filter === 'reported' ? postsRes.data : postsRes.data);
     } catch (err) {
       console.error('Failed to fetch admin data');
     }
@@ -93,13 +95,13 @@ function Admin() {
 
       {/* Filter */}
       <div className="filter-bar">
-        {['pending', 'approved', 'hidden', 'rejected'].map(f => (
+        {['pending', 'approved', 'reported', 'hidden', 'rejected'].map(f => (
           <button
             key={f}
             className={`filter-btn ${filter === f ? 'active' : ''}`}
             onClick={() => setFilter(f)}
           >
-            {f === 'approved' ? 'Live' : f === 'hidden' ? 'Archived' : f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === 'approved' ? 'Live' : f === 'hidden' ? 'Archived' : f === 'reported' ? '🚩 Reported' : f.charAt(0).toUpperCase() + f.slice(1)}
           </button>
         ))}
       </div>
