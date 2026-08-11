@@ -42,10 +42,12 @@ function Announcements() {
       setMessage('Announcement posted!');
       fetchAnnouncements();
     } catch (err) {
-      setMessage('Failed to post announcement');
+      const errorMsg = err.response?.data?.error || err.response?.status || err.message;
+      setMessage('Failed to post: ' + errorMsg);
+      console.error('Announcement error:', err.response?.data, err.response?.status);
     }
     setSubmitting(false);
-    setTimeout(() => setMessage(''), 3000);
+    setTimeout(() => setMessage(''), 5000);
   };
 
   const handleDelete = async (id) => {
