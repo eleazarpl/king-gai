@@ -87,6 +87,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get my posts (authenticated) — must be before /:id
+router.get('/me/posts', authenticate, async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const postsWithVotes = posts.map(post => ({
+      ...post,
+      voteCount: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
+      replyCount: post.replies?.length || 0
+    }));
+
+    res.json(postsWithVotes);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch your posts' });
+  }
+});
+
 // Get single post
 router.get('/:id', async (req, res) => {
   try {
@@ -212,25 +231,6 @@ router.post('/:id/reply', optionalAuth, async (req, res) => {
     res.status(201).json({ message: 'Reply added', reply: post.replies[post.replies.length - 1] });
   } catch (error) {
     res.status(500).json({ error: 'Failed to add reply' });
-  }
-});
-
-// Get my posts (authenticated)
-router.get('/me/posts', authenticate, async (req, res) => {
-  try {
-    const posts = await Post.find({ author: req.user._id })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    const postsWithVotes = posts.map(post => ({
-      ...post,
-      voteCount: (post.upvotes?.length || 0) - (post.downvotes?.length || 0),
-      replyCount: post.replies?.length || 0
-    }));
-
-    res.json(postsWithVotes);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch your posts' });
   }
 });
 
